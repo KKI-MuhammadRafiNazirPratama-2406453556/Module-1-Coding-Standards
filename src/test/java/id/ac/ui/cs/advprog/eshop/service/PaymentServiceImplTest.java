@@ -155,6 +155,98 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    void testAddPaymentVoucherCodeNullCode() {
+        Map<String, String> paymentData = new HashMap<>();
+        paymentData.put("voucherCode", null);
+
+        Payment payment = new Payment("13652556-012a-4c07-b546-54eb1396d79b",
+                PaymentMethod.VOUCHER_CODE.getValue(), order, paymentData);
+        doReturn(payment).when(paymentRepository).save(any(Payment.class));
+
+        Payment result = paymentService.addPayment(order,
+                PaymentMethod.VOUCHER_CODE.getValue(), paymentData);
+
+        assertEquals(PaymentStatus.REJECTED.getValue(), result.getStatus());
+    }
+
+    @Test
+    void testAddPaymentVoucherCodeWrongPrefix() {
+        Map<String, String> paymentData = new HashMap<>();
+        paymentData.put("voucherCode", "WRONG1234ABC5678");
+
+        Payment payment = new Payment("13652556-012a-4c07-b546-54eb1396d79b",
+                PaymentMethod.VOUCHER_CODE.getValue(), order, paymentData);
+        doReturn(payment).when(paymentRepository).save(any(Payment.class));
+
+        Payment result = paymentService.addPayment(order,
+                PaymentMethod.VOUCHER_CODE.getValue(), paymentData);
+
+        assertEquals(PaymentStatus.REJECTED.getValue(), result.getStatus());
+    }
+
+    @Test
+    void testAddPaymentVoucherCodeWrongDigitCount() {
+        Map<String, String> paymentData = new HashMap<>();
+        paymentData.put("voucherCode", "ESHOPABCDEFG1234");
+
+        Payment payment = new Payment("13652556-012a-4c07-b546-54eb1396d79b",
+                PaymentMethod.VOUCHER_CODE.getValue(), order, paymentData);
+        doReturn(payment).when(paymentRepository).save(any(Payment.class));
+
+        Payment result = paymentService.addPayment(order,
+                PaymentMethod.VOUCHER_CODE.getValue(), paymentData);
+
+        assertEquals(PaymentStatus.REJECTED.getValue(), result.getStatus());
+    }
+
+    @Test
+    void testAddPaymentBankTransferNullBankName() {
+        Map<String, String> paymentData = new HashMap<>();
+        paymentData.put("bankName", null);
+        paymentData.put("referenceCode", "REF123456");
+
+        Payment payment = new Payment("13652556-012a-4c07-b546-54eb1396d79b",
+                PaymentMethod.BANK_TRANSFER.getValue(), order, paymentData);
+        doReturn(payment).when(paymentRepository).save(any(Payment.class));
+
+        Payment result = paymentService.addPayment(order,
+                PaymentMethod.BANK_TRANSFER.getValue(), paymentData);
+
+        assertEquals(PaymentStatus.REJECTED.getValue(), result.getStatus());
+    }
+
+    @Test
+    void testAddPaymentBankTransferEmptyReferenceCode() {
+        Map<String, String> paymentData = new HashMap<>();
+        paymentData.put("bankName", "BCA");
+        paymentData.put("referenceCode", "");
+
+        Payment payment = new Payment("13652556-012a-4c07-b546-54eb1396d79b",
+                PaymentMethod.BANK_TRANSFER.getValue(), order, paymentData);
+        doReturn(payment).when(paymentRepository).save(any(Payment.class));
+
+        Payment result = paymentService.addPayment(order,
+                PaymentMethod.BANK_TRANSFER.getValue(), paymentData);
+
+        assertEquals(PaymentStatus.REJECTED.getValue(), result.getStatus());
+    }
+
+    @Test
+    void testAddPaymentUnknownMethod() {
+        Map<String, String> paymentData = new HashMap<>();
+        paymentData.put("customKey", "customValue");
+
+        Payment payment = new Payment("13652556-012a-4c07-b546-54eb1396d79b",
+                "CASH", order, paymentData);
+        doReturn(payment).when(paymentRepository).save(any(Payment.class));
+
+        Payment result = paymentService.addPayment(order, "CASH", paymentData);
+
+        assertEquals(PaymentStatus.REJECTED.getValue(), result.getStatus());
+        verify(paymentRepository, times(1)).save(any(Payment.class));
+    }
+
+    @Test
     void testGetPayment() {
         Map<String, String> paymentData = new HashMap<>();
         paymentData.put("voucherCode", "ESHOP1234ABC5678");

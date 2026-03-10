@@ -41,6 +41,36 @@ class ProductRepositoryTest {
         assertFalse(productIterator.hasNext());
     }
     @Test
+    void testCreate_withNullId_generatesId() {
+        Product product = new Product();
+        product.setProductName("Auto ID Product");
+        product.setProductQuantity(10);
+        productRepository.create(product);
+
+        assertNotNull(product.getProductId());
+        Product found = productRepository.findById(product.getProductId());
+        assertNotNull(found);
+    }
+
+    @Test
+    void testFindById_notFound() {
+        Product found = productRepository.findById("non-existent-id");
+        assertNull(found);
+    }
+
+    @Test
+    void testFindById_existsButDifferentId() {
+        Product product = new Product();
+        product.setProductId("eb558e9f-1c39-460e-8860-71af6af63bd6");
+        product.setProductName("Sampo Cap Bambang");
+        product.setProductQuantity(100);
+        productRepository.create(product);
+
+        Product found = productRepository.findById("different-id");
+        assertNull(found);
+    }
+
+    @Test
     void testFindAllIfMoreThanOneProduct() {
         Product product1 = new Product();
         product1.setProductId("eb558e9f-1c39-460e-8860-71af6af63bd6");

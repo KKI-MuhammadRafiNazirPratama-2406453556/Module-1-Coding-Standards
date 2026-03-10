@@ -198,3 +198,15 @@ When `CarController` injected `CarServiceImpl` directly and used `@Autowired` fi
 
 **Maintenance confusion from violating SRP**
 Having `CarController` inside `ProductController.java` means a developer fixing a car-routing bug must open and edit a file named after products. Over time, as both controllers grow, the file becomes a catch-all that is difficult to navigate, review in pull requests, and reason about in isolation. A single file with multiple unrelated responsibilities is a maintenance liability that compounds with every new feature.
+
+---
+
+## Module 4 Reflection
+
+### 1. TDD Flow Usefulness
+
+The TDD flow (Red-Green-Refactor) proved useful for clarifying requirements before implementation and ensuring that each piece of code has a corresponding test. In practice, however, the tests in this project were largely written after the implementation rather than before, which meant the design-driving benefit of TDD was not fully realized. For future test creation, I will adopt a stricter TDD discipline: write a failing test first, implement the minimal code to pass it, then refactor. This will help catch edge cases earlier and prevent over-engineering, while also improving test coverage of the actual behavior rather than the existing implementation.
+
+### 2. F.I.R.S.T. Principle in Unit Tests
+
+The unit tests in this project partially followed the F.I.R.S.T. principle. They are Fast (using mocks and no external dependencies), Self-validating (clear pass/fail via assertions), and largely Independent (each test uses @BeforeEach for fresh setup). However, some tests could be more Independent and Repeatable: functional tests share in-memory state and depend on execution order, while repository tests that create multiple products in sequence may be sensitive to shared state. Going forward, I will ensure each test resets or isolates its data completely, avoid shared mutable state between tests, and keep functional tests from depending on one another so that any test can run in any order and produce the same result every time.
